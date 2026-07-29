@@ -1,13 +1,14 @@
 import type { T } from "../i18n/translations";
 import { OrnamentDivider } from "./OrnamentDivider";
 import { FallingPetals } from "./FallingPetals";
+import { asset } from "../lib/assets";
 
 export function Hero({ t, lang, visible, petalsVisible }: { t: T; lang: string; visible: boolean; petalsVisible?: boolean }) {
   const isAr = lang === "ar";
 
   return (
     <section className={`relative h-[100dvh] min-h-[640px] w-full overflow-hidden ${visible ? "curtains-open" : ""}`}>
-      <img src="/hero-bg.jpg" alt="Venue" className="absolute inset-0 h-full w-full object-cover"
+      <img src={asset("/hero-bg.jpg")} alt="Venue" className="absolute inset-0 h-full w-full object-cover"
         style={{ filter: "saturate(0.9) brightness(1.02)" }} />
       <div
         className="absolute inset-0"
@@ -17,11 +18,11 @@ export function Hero({ t, lang, visible, petalsVisible }: { t: T; lang: string; 
       />
       <div className="absolute inset-0 bg-gradient-to-b from-ink/10 via-transparent to-ink/40" />
       <div className="absolute left-1/2 top-0 z-30 chandelier-sway">
-        <img src="/chandelier.png" alt="" className="h-[34vh] w-auto max-w-[60vw] object-contain"
+        <img src={asset("/chandelier.png")} alt="" className="h-[34vh] w-auto max-w-[60vw] object-contain"
           style={{ filter: "drop-shadow(0 8px 16px oklch(0.4 0.1 60 / 0.4))" }} />
       </div>
-      <img src="/curtain.png" alt="" className="curtain curtain-left" />
-      <img src="/curtain.png" alt="" className="curtain curtain-right" />
+      <img src={asset("/curtain.png")} alt="" className="curtain curtain-left" />
+      <img src={asset("/curtain.png")} alt="" className="curtain curtain-right" />
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-8 text-center">
         <div className={`fade-up ${visible ? "" : "opacity-0"}`}>
           <div className={`mb-4 text-[10px] tracking-[0.5em] text-gold-deep/80 ${isAr ? "font-arabic text-sm tracking-normal" : "uppercase"}`}>

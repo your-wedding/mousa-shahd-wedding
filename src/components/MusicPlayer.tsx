@@ -1,12 +1,13 @@
 import { useRef, useState, useEffect } from "react";
 import { Volume2, VolumeX } from "lucide-react";
+import { asset } from "../lib/assets";
 
 export function MusicPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
-    const audio = new Audio("/wedding-music.mp3");
+    const audio = new Audio(asset("/wedding-music.mp3"));
     audio.loop = true;
     audio.volume = 0.5;
     audioRef.current = audio;

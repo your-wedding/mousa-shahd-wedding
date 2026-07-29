@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { T } from "../i18n/translations";
+import { asset } from "../lib/assets";
 
 export function Envelope({ onOpen, t }: { onOpen: () => void; t: T }) {
   const [opened, setOpened] = useState(false);
@@ -17,7 +18,7 @@ export function Envelope({ onOpen, t }: { onOpen: () => void; t: T }) {
       <div className="env-back" aria-hidden />
       <div className={`env-flap ${opened ? "is-open" : ""}`} aria-hidden>
         <div className="env-flap-shape" />
-        <img src="/envelope-top.png" alt="" className="env-flap-ornament" draggable={false} />
+        <img src={asset("/envelope-top.png")} alt="" className="env-flap-ornament" draggable={false} />
       </div>
       <button
         type="button"
@@ -26,7 +27,7 @@ export function Envelope({ onOpen, t }: { onOpen: () => void; t: T }) {
         aria-label="Open invitation"
       >
         <span className="env-seal-halo" aria-hidden />
-        <img src="/flap-ornament.png" alt="" className="env-seal-img" draggable={false} />
+        <img src={asset("/flap-ornament.png")} alt="" className="env-seal-img" draggable={false} />
       </button>
       <div className={`env-hint ${opened ? "is-open" : ""}`}>
         <div className="env-hint-text font-serif-elegant">{t.tapToOpen}</div>

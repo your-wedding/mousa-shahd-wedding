@@ -1,5 +1,6 @@
 import type { T } from "../i18n/translations";
 import { OrnamentDivider } from "./OrnamentDivider";
+import { asset } from "../lib/assets";
 
 export function Venue({ t, lang }: { t: T; lang: string }) {
   const isAr = lang === "ar";
@@ -19,7 +20,7 @@ export function Venue({ t, lang }: { t: T; lang: string }) {
         <div className="relative mt-10 p-2">
           <div className="relative overflow-hidden border border-gold-deep/50">
             <div className="relative border border-gold/40">
-              <img src="/venue.jpg" alt="Wedding venue" className="block h-[420px] w-full object-cover" loading="lazy" />
+              <img src={asset("/venue.jpg")} alt="Wedding venue" className="block h-[420px] w-full object-cover" loading="lazy" />
               <div className="pointer-events-none absolute inset-0" style={{
                 background: "radial-gradient(ellipse at center, transparent 55%, oklch(0.55 0.08 65 / 0.28) 100%)"
               }} />
