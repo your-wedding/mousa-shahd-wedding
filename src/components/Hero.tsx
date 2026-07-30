@@ -29,11 +29,11 @@ export function Hero({ t, lang, visible, petalsVisible }: { t: T; lang: string; 
             {t.withHonor}
           </div>
           <h1 className="font-script text-[clamp(3.5rem,14vw,7rem)] leading-[0.85] text-ink/85">
-            {t.groomName}
+            Mousa
           </h1>
           <div className="my-1 font-serif-elegant text-2xl italic text-gold-deep">&</div>
           <h1 className="font-script text-[clamp(3.5rem,14vw,7rem)] leading-[0.85] text-ink/85">
-            {t.brideName}
+            Shahd
           </h1>
           <OrnamentDivider className="mx-auto mt-6 h-6 w-44 text-gold-deep" />
           <div className={`mt-4 text-sm md:text-base text-ink/80 ${isAr ? "font-arabic" : "font-display"}`}>
