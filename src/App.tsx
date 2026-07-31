@@ -7,6 +7,7 @@ import { SaveDate } from "./components/SaveDate";
 import { Timeline } from "./components/Timeline";
 import { Venue } from "./components/Venue";
 import { MapSection } from "./components/MapSection";
+import { RSVPSection } from "./components/RSVPSection";
 import { MusicPlayer } from "./components/MusicPlayer";
 import { LanguageToggle } from "./components/LanguageToggle";
 import { OrnamentDivider } from "./components/OrnamentDivider";
@@ -41,6 +42,8 @@ function MainContent() {
       <Venue t={t} lang={lang} />
 
       <MapSection t={t} lang={lang} />
+
+      <RSVPSection t={t} lang={lang} />
 
       <footer className="relative px-6 py-20 text-center">
         <OrnamentDivider className="mx-auto h-6 w-48 text-gold-deep" />
