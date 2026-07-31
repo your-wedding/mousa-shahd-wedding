@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 import type { T } from "../i18n/translations";
 import { OrnamentDivider } from "./OrnamentDivider";
-import { db } from "../lib/firebase";
-import { collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "firebase/firestore";
 
 interface RSVPItem {
   id?: string;
   name: string;
   status: "attending" | "not-attending";
   guests: number;
-  createdAt?: any;
+  createdAt?: string;
 }
 
 export function RSVPSection({ t, lang }: { t: T; lang: string }) {
@@ -22,55 +20,56 @@ export function RSVPSection({ t, lang }: { t: T; lang: string }) {
   const [rsvps, setRsvps] = useState<RSVPItem[]>([]);
   const [error, setError] = useState("");
 
-  // Real-time listener from Firestore with localStorage fallback
-  useEffect(() => {
-    let unsubscribe: (() => void) | undefined;
+  // Google Apps Script Web App URL from env or localStorage
+  const [sheetUrl, setSheetUrl] = useState(() => {
+    return import.meta.env.VITE_GOOGLE_SHEET_URL || localStorage.getItem("zoro_sheet_url") || "";
+  });
+  const [showConfig, setShowConfig] = useState(false);
+  const [tempUrl, setTempUrl] = useState(sheetUrl);
 
-    try {
-      const q = query(collection(db, "rsvps"), orderBy("createdAt", "desc"));
-      unsubscribe = onSnapshot(
-        q,
-        (snapshot: any) => {
-          const items: RSVPItem[] = [];
-          snapshot.forEach((doc: any) => {
-            items.push({ id: doc.id, ...doc.data() } as RSVPItem);
-          });
-          setRsvps(items);
-        },
-        (err: any) => {
-          console.warn("Firestore listener fallback to localStorage:", err?.message);
-          loadLocalRsvps();
-        }
-      );
-    } catch (e) {
-      console.warn("Firestore init fallback:", e);
-      loadLocalRsvps();
-    }
-
-    // BroadcastChannel for cross-tab local real-time sync if Firestore is in fallback
-    const channel = new BroadcastChannel("zoro_wedding_rsvp");
-    channel.onmessage = () => {
-      loadLocalRsvps();
-    };
-
-    function loadLocalRsvps() {
+  // Fetch RSVPs from Google Sheet or LocalStorage
+  const fetchRsvps = async () => {
+    if (sheetUrl) {
       try {
-        const saved = localStorage.getItem("zoro_rsvps");
-        if (saved) {
-          setRsvps(JSON.parse(saved));
+        const res = await fetch(sheetUrl);
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setRsvps(data.reverse()); // latest first
+          return;
         }
-      } catch (ex) {
-        console.error(ex);
+      } catch (err) {
+        console.warn("Failed to fetch from Google Sheet, falling back to local storage:", err);
       }
     }
-
+    // Fallback to localStorage
     loadLocalRsvps();
+  };
+
+  useEffect(() => {
+    fetchRsvps();
+    const interval = setInterval(fetchRsvps, 10000); // Poll every 10s for live updates
+
+    const channel = new BroadcastChannel("zoro_wedding_rsvp");
+    channel.onmessage = () => {
+      fetchRsvps();
+    };
 
     return () => {
-      if (unsubscribe) unsubscribe();
+      clearInterval(interval);
       channel.close();
     };
-  }, []);
+  }, [sheetUrl]);
+
+  function loadLocalRsvps() {
+    try {
+      const saved = localStorage.getItem("zoro_rsvps");
+      if (saved) {
+        setRsvps(JSON.parse(saved));
+      }
+    } catch (ex) {
+      console.error(ex);
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,40 +82,95 @@ export function RSVPSection({ t, lang }: { t: T; lang: string }) {
       name: name.trim(),
       status,
       guests: status === "attending" ? guests : 0,
-      createdAt: new Date().toISOString(),
+      createdAt: new Date().toLocaleString(),
     };
 
-    try {
-      // Try saving to Firestore
-      await addDoc(collection(db, "rsvps"), {
-        ...newItem,
-        createdAt: serverTimestamp(),
-      });
-      setSubmitted(true);
-    } catch (err: any) {
-      console.warn("Firestore write fallback to localStorage:", err?.message);
-      // Fallback to localStorage + BroadcastChannel
+    let savedSuccessfully = false;
+
+    if (sheetUrl) {
       try {
-        const current = JSON.parse(localStorage.getItem("zoro_rsvps") || "[]");
-        const updated = [{ ...newItem, id: Date.now().toString() }, ...current];
-        localStorage.setItem("zoro_rsvps", JSON.stringify(updated));
-        setRsvps(updated);
-        const channel = new BroadcastChannel("zoro_wedding_rsvp");
-        channel.postMessage("update");
-        channel.close();
-        setSubmitted(true);
-      } catch {
-        setError("Could not save response. Please try again.");
+        await fetch(sheetUrl, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newItem),
+        });
+        savedSuccessfully = true;
+      } catch (err) {
+        console.warn("Sheet POST failed, saving locally:", err);
       }
-    } finally {
-      setLoading(false);
     }
+
+    // Always save locally + BroadcastChannel as primary/backup
+    try {
+      const current = JSON.parse(localStorage.getItem("zoro_rsvps") || "[]");
+      const updated = [{ ...newItem, id: Date.now().toString() }, ...current];
+      localStorage.setItem("zoro_rsvps", JSON.stringify(updated));
+      setRsvps(updated);
+      const channel = new BroadcastChannel("zoro_wedding_rsvp");
+      channel.postMessage("update");
+      channel.close();
+      savedSuccessfully = true;
+    } catch {
+      if (!savedSuccessfully) {
+        setError("Could not save response. Please try again.");
+        setLoading(false);
+        return;
+      }
+    }
+
+    setLoading(false);
+    setSubmitted(true);
+    // Refresh list
+    setTimeout(fetchRsvps, 1500);
+  };
+
+  const handleSaveConfig = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSheetUrl(tempUrl);
+    localStorage.setItem("zoro_sheet_url", tempUrl);
+    setShowConfig(false);
+    alert(isAr ? "تم حفظ رابط Google Sheet بنجاح!" : "Google Sheet URL saved successfully!");
   };
 
   return (
     <section className="relative px-6 py-20 bg-[oklch(0.97_0.01_80)] border-t border-b border-gold/20">
       <div className="mx-auto w-full max-w-[520px]">
-        <div className="bg-white/90 p-8 shadow-[0_20px_40px_-15px_oklch(0.35_0.07_60/0.2)] border border-gold-deep/40 text-center">
+        <div className="bg-white/90 p-8 shadow-[0_20px_40px_-15px_oklch(0.35_0.07_60/0.2)] border border-gold-deep/40 text-center relative">
+          
+          {/* Config button for Admin / Host */}
+          <button
+            type="button"
+            onClick={() => setShowConfig(!showConfig)}
+            className="absolute top-3 left-3 text-[10px] text-gold-deep/60 hover:text-gold-deep underline font-arabic"
+            title="ربط بـ Google Sheet"
+          >
+            {isAr ? "⚙️ إعدادات الرابط" : "⚙️ Sheet URL"}
+          </button>
+
+          {showConfig && (
+            <form onSubmit={handleSaveConfig} className="mb-6 p-4 bg-paper rounded border border-gold-deep/30 text-left" dir="ltr">
+              <label className="block text-xs font-medium text-ink/80 mb-1">
+                Google Apps Script Web App URL:
+              </label>
+              <input
+                type="url"
+                value={tempUrl}
+                onChange={(e) => setTempUrl(e.target.value)}
+                placeholder="https://script.google.com/macros/s/.../exec"
+                className="w-full text-xs p-2 border rounded mb-2 bg-white text-ink"
+              />
+              <div className="flex gap-2">
+                <button type="submit" className="px-3 py-1 bg-gold-deep text-white text-xs rounded">
+                  Save
+                </button>
+                <button type="button" onClick={() => setShowConfig(false)} className="px-3 py-1 bg-stone-300 text-xs rounded">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
+
           <div className={`font-arabic text-xl font-bold text-gold-deep mb-2`}>
             {t.rsvpTitle}
           </div>
