@@ -60,7 +60,7 @@ export const translations = {
     addApple: "تحميل ملف .ics (Apple / Outlook)",
     timelineTitle: "برنامج الحفل",
     timeline: [
-      { time: "٤:٣٠", title: "مغادرة بيت العروس", note: "" },
+      { time: "٤:٣٠ م", title: "مغادرة بيت العروس", note: "" },
       { time: "٧:٠٠ م", title: "بدء حفل الزفاف", note: "" },
     ],
     venueKicker: "المكان",
