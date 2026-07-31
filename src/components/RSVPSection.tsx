@@ -22,7 +22,7 @@ export function RSVPSection({ t, lang }: { t: T; lang: string }) {
 
   // Google Apps Script Web App URL from env or localStorage
   const [sheetUrl, setSheetUrl] = useState(() => {
-    return import.meta.env.VITE_GOOGLE_SHEET_URL || localStorage.getItem("zoro_sheet_url") || "";
+    return import.meta.env.VITE_GOOGLE_SHEET_URL || localStorage.getItem("zoro_sheet_url") || "https://script.google.com/macros/s/AKfycbzHvOc67tjH-dR3tBPjlm2PpLVmk33y0TMokIV2pStAbQqf3GQhiRktHfNmtCpGa-BO/exec";
   });
   const [showConfig, setShowConfig] = useState(false);
   const [tempUrl, setTempUrl] = useState(sheetUrl);
