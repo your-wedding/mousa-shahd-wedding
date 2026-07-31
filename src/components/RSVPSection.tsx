@@ -20,12 +20,8 @@ export function RSVPSection({ t, lang }: { t: T; lang: string }) {
   const [rsvps, setRsvps] = useState<RSVPItem[]>([]);
   const [error, setError] = useState("");
 
-  // Google Apps Script Web App URL from env or localStorage
-  const [sheetUrl, setSheetUrl] = useState(() => {
-    return import.meta.env.VITE_GOOGLE_SHEET_URL || localStorage.getItem("zoro_sheet_url") || "https://script.google.com/macros/s/AKfycbzHvOc67tjH-dR3tBPjlm2PpLVmk33y0TMokIV2pStAbQqf3GQhiRktHfNmtCpGa-BO/exec";
-  });
-  const [showConfig, setShowConfig] = useState(false);
-  const [tempUrl, setTempUrl] = useState(sheetUrl);
+  // Google Apps Script Web App URL
+  const sheetUrl = "https://script.google.com/macros/s/AKfycbzHvOc67tjH-dR3tBPjlm2PpLVmk33y0TMokIV2pStAbQqf3GQhiRktHfNmtCpGa-BO/exec";
 
   // Fetch RSVPs from Google Sheet or LocalStorage
   const fetchRsvps = async () => {
@@ -125,51 +121,10 @@ export function RSVPSection({ t, lang }: { t: T; lang: string }) {
     setTimeout(fetchRsvps, 1500);
   };
 
-  const handleSaveConfig = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSheetUrl(tempUrl);
-    localStorage.setItem("zoro_sheet_url", tempUrl);
-    setShowConfig(false);
-    alert(isAr ? "تم حفظ رابط Google Sheet بنجاح!" : "Google Sheet URL saved successfully!");
-  };
-
   return (
     <section className="relative px-6 py-20 bg-[oklch(0.97_0.01_80)] border-t border-b border-gold/20">
       <div className="mx-auto w-full max-w-[520px]">
         <div className="bg-white/90 p-8 shadow-[0_20px_40px_-15px_oklch(0.35_0.07_60/0.2)] border border-gold-deep/40 text-center relative">
-          
-          {/* Config button for Admin / Host */}
-          <button
-            type="button"
-            onClick={() => setShowConfig(!showConfig)}
-            className="absolute top-3 left-3 text-[10px] text-gold-deep/60 hover:text-gold-deep underline font-arabic"
-            title="ربط بـ Google Sheet"
-          >
-            {isAr ? "⚙️ إعدادات الرابط" : "⚙️ Sheet URL"}
-          </button>
-
-          {showConfig && (
-            <form onSubmit={handleSaveConfig} className="mb-6 p-4 bg-paper rounded border border-gold-deep/30 text-left" dir="ltr">
-              <label className="block text-xs font-medium text-ink/80 mb-1">
-                Google Apps Script Web App URL:
-              </label>
-              <input
-                type="url"
-                value={tempUrl}
-                onChange={(e) => setTempUrl(e.target.value)}
-                placeholder="https://script.google.com/macros/s/.../exec"
-                className="w-full text-xs p-2 border rounded mb-2 bg-white text-ink"
-              />
-              <div className="flex gap-2">
-                <button type="submit" className="px-3 py-1 bg-gold-deep text-white text-xs rounded">
-                  Save
-                </button>
-                <button type="button" onClick={() => setShowConfig(false)} className="px-3 py-1 bg-stone-300 text-xs rounded">
-                  Cancel
-                </button>
-              </div>
-            </form>
-          )}
 
           <div className={`font-arabic text-xl font-bold text-gold-deep mb-2`}>
             {t.rsvpTitle}
