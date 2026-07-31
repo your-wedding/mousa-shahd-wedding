@@ -12,7 +12,7 @@ export const translations = {
     addApple: "Download .ics (Apple / Outlook)",
     timelineTitle: "Event Timeline",
     timeline: [
-      { time: "4:00 PM", title: "Leaving the bride's house", note: "" },
+      { time: "4:30 PM", title: "Leaving the bride's house", note: "" },
       { time: "7:00 PM", title: "Wedding Reception Begins", note: "" },
     ],
     venueKicker: "The Venue",
@@ -51,7 +51,7 @@ export const translations = {
     addApple: "تحميل ملف .ics (Apple / Outlook)",
     timelineTitle: "برنامج الحفل",
     timeline: [
-      { time: "٤:٠٠ م", title: "مغادرة بيت العروس", note: "" },
+      { time: "٤:٣٠ م", title: "مغادرة بيت العروس", note: "" },
       { time: "٧:٠٠ م", title: "بدء حفل الزفاف", note: "" },
     ],
     venueKicker: "المكان",
