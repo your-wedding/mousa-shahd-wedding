@@ -20,41 +20,14 @@ export function RSVPSection({ t, lang }: { t: T; lang: string }) {
   const [rsvps, setRsvps] = useState<RSVPItem[]>([]);
   const [error, setError] = useState("");
 
-  // Google Apps Script Web App URL
-  const sheetUrl = "https://script.google.com/macros/s/AKfycbzHvOc67tjH-dR3tBPjlm2PpLVmk33y0TMokIV2pStAbQqf3GQhiRktHfNmtCpGa-BO/exec";
-
-  // Fetch RSVPs from Google Sheet or LocalStorage
+  // Store RSVPs locally in the browser so entries are saved without a Google Sheet dependency.
   const fetchRsvps = async () => {
-    if (sheetUrl) {
-      try {
-        const res = await fetch(sheetUrl);
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          setRsvps(data.reverse()); // latest first
-          return;
-        }
-      } catch (err) {
-        console.warn("Failed to fetch from Google Sheet, falling back to local storage:", err);
-      }
-    }
-    // Fallback to localStorage
     loadLocalRsvps();
   };
 
   useEffect(() => {
     fetchRsvps();
-    const interval = setInterval(fetchRsvps, 10000); // Poll every 10s for live updates
-
-    const channel = new BroadcastChannel("zoro_wedding_rsvp");
-    channel.onmessage = () => {
-      fetchRsvps();
-    };
-
-    return () => {
-      clearInterval(interval);
-      channel.close();
-    };
-  }, [sheetUrl]);
+  }, []);
 
   function loadLocalRsvps() {
     try {
@@ -81,44 +54,18 @@ export function RSVPSection({ t, lang }: { t: T; lang: string }) {
       createdAt: new Date().toLocaleString(),
     };
 
-    let savedSuccessfully = false;
-
-    if (sheetUrl) {
-      try {
-        await fetch(sheetUrl, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newItem),
-        });
-        savedSuccessfully = true;
-      } catch (err) {
-        console.warn("Sheet POST failed, saving locally:", err);
-      }
-    }
-
-    // Always save locally + BroadcastChannel as primary/backup
     try {
       const current = JSON.parse(localStorage.getItem("zoro_rsvps") || "[]");
       const updated = [{ ...newItem, id: Date.now().toString() }, ...current];
       localStorage.setItem("zoro_rsvps", JSON.stringify(updated));
       setRsvps(updated);
-      const channel = new BroadcastChannel("zoro_wedding_rsvp");
-      channel.postMessage("update");
-      channel.close();
-      savedSuccessfully = true;
+      setLoading(false);
+      setSubmitted(true);
+      setTimeout(fetchRsvps, 1500);
     } catch {
-      if (!savedSuccessfully) {
-        setError("Could not save response. Please try again.");
-        setLoading(false);
-        return;
-      }
+      setError("Could not save response. Please try again.");
+      setLoading(false);
     }
-
-    setLoading(false);
-    setSubmitted(true);
-    // Refresh list
-    setTimeout(fetchRsvps, 1500);
   };
 
   return (
