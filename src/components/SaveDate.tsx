@@ -32,7 +32,7 @@ export function SaveDate({ t, lang, target }: { t: T; lang: Lang; target: Date }
             <div className={`text-[10px] text-gold-deep/80 ${isAr ? "font-arabic text-sm tracking-normal" : "font-display tracking-[0.4em] uppercase"}`}>
               {t.saturday}
             </div>
-            <div className="font-script text-7xl leading-none text-gold-gradient">21</div>
+            <div className="font-script text-7xl leading-none text-gold-gradient">24</div>
             <div className={`text-xs text-ink/70 ${isAr ? "font-arabic text-sm" : "font-display tracking-[0.35em] uppercase"}`}>
               {t.monthYear}
             </div>
@@ -42,7 +42,7 @@ export function SaveDate({ t, lang, target }: { t: T; lang: Lang; target: Date }
           </div>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
-              href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Mousa%20%26%20Shahd%20Wedding&dates=20260821T153000Z/20260821T200000Z&location=Wedding%20Venue&details=Wedding%20of%20Mousa%20%26%20Shahd"
+              href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Mousa%20%26%20Shahd%20Wedding&dates=20260924T153000Z/20260924T200000Z&location=Wedding%20Venue&details=Wedding%20of%20Mousa%20%26%20Shahd"
               target="_blank"
               rel="noreferrer"
               className={`group relative overflow-hidden border border-gold-deep/60 bg-gold-deep px-6 py-3 text-xs text-cream transition hover:bg-ink ${isAr ? "font-arabic text-sm" : "font-display tracking-[0.3em] uppercase"}`}
