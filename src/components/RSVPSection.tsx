@@ -18,6 +18,7 @@ export function RSVPSection({ t, lang }: { t: T; lang: string }) {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [rsvps, setRsvps] = useState<RSVPItem[]>([]);
+  void rsvps;
   const [error, setError] = useState("");
 
   // Google Apps Script Web App URL
