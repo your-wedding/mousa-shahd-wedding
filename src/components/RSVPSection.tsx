@@ -21,7 +21,7 @@ export function RSVPSection({ t, lang }: { t: T; lang: string }) {
   const [error, setError] = useState("");
 
   // Google Apps Script Web App URL
-  const sheetUrl = "https://script.google.com/macros/s/AKfycbzHvOc67tjH-dR3tBPjlm2PpLVmk33y0TMokIV2pStAbQqf3GQhiRktHfNmtCpGa-BO/exec";
+  const sheetUrl = "https://script.google.com/macros/s/AKfycby8alzWvltDMBDdEpjvGeJUQ001lq6WUwm-5rogkgGCZfRg4A56K9pdu2YBsTiAxgc/exec";
 
   // Fetch RSVPs from Google Sheet or LocalStorage
   const fetchRsvps = async () => {
