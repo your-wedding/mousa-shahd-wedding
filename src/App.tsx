@@ -12,7 +12,7 @@ import { MusicPlayer } from "./components/MusicPlayer";
 import { LanguageToggle } from "./components/LanguageToggle";
 import { OrnamentDivider } from "./components/OrnamentDivider";
 
-const WEDDING_DATE = new Date("2026-08-21T15:30:00Z");
+const WEDDING_DATE = new Date("2026-08-24T15:30:00Z");
 
 function MainContent() {
   const [lang, setLang] = useState<Lang>("ar");
@@ -51,7 +51,7 @@ function MainContent() {
           {t.footer}
         </p>
         <div className="mt-6 text-xs tracking-[0.4em] uppercase text-ink/50">
-          {t.groomName.toUpperCase()} &amp; {t.brideName.toUpperCase()} · 21.08.2026
+          {t.groomName.toUpperCase()} &amp; {t.brideName.toUpperCase()} · 24.08.2026
         </div>
       </footer>
 
