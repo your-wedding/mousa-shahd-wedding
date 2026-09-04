@@ -85,17 +85,21 @@ export function RSVPSection({ t, lang }: { t: T; lang: string }) {
     let savedSuccessfully = false;
 
     if (sheetUrl) {
-      try {
-        await fetch(sheetUrl, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newItem),
+      // Fire-and-forget - do not block UI if Sheet is slow
+      fetch(sheetUrl, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newItem),
+      })
+        .then(() => {
+          savedSuccessfully = true;
+        })
+        .catch((err) => {
+          console.warn("Sheet POST failed, saving locally:", err);
         });
-        savedSuccessfully = true;
-      } catch (err) {
-        console.warn("Sheet POST failed, saving locally:", err);
-      }
+      // Consider it saved to avoid blocking - localStorage is primary
+      savedSuccessfully = true;
     }
 
     // Always save locally + BroadcastChannel as primary/backup
