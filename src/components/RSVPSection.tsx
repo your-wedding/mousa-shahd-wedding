@@ -18,7 +18,6 @@ export function RSVPSection({ t, lang }: { t: T; lang: string }) {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [rsvps, setRsvps] = useState<RSVPItem[]>([]);
-  void rsvps;
   const [error, setError] = useState("");
 
   // Google Apps Script Web App URL
@@ -43,18 +42,22 @@ export function RSVPSection({ t, lang }: { t: T; lang: string }) {
   };
 
   useEffect(() => {
-    // Clear old local data - remove all previously stored responses
+    // Clear old local data once
     try {
       localStorage.removeItem("zoro_rsvps");
-      localStorage.removeItem("rsvps");
     } catch {}
-    setRsvps([]);
-    // Do not fetch old responses - keep list empty
-    // fetchRsvps();
-    // const interval = setInterval(fetchRsvps, 10000);
-    // const channel = new BroadcastChannel("zoro_wedding_rsvp");
-    // channel.onmessage = () => { fetchRsvps(); };
-    // return () => { clearInterval(interval); channel.close(); };
+    fetchRsvps();
+    const interval = setInterval(fetchRsvps, 10000); // Poll every 10s for live updates
+
+    const channel = new BroadcastChannel("zoro_wedding_rsvp");
+    channel.onmessage = () => {
+      fetchRsvps();
+    };
+
+    return () => {
+      clearInterval(interval);
+      channel.close();
+    };
   }, [sheetUrl]);
 
   function loadLocalRsvps() {
@@ -241,7 +244,40 @@ export function RSVPSection({ t, lang }: { t: T; lang: string }) {
             </form>
           )}
 
-
+          {/* Live Responses List */}
+          {rsvps.length > 0 && (
+            <div className="mt-10 border-t border-gold/30 pt-6 text-left" dir={isAr ? "rtl" : "ltr"}>
+              <h3 className="font-arabic text-sm font-bold text-gold-deep mb-3 text-center">
+                {t.rsvpListTitle} ({rsvps.length})
+              </h3>
+              <div className="max-h-48 overflow-y-auto space-y-2 pr-1">
+                {rsvps.map((item, idx) => (
+                  <div
+                    key={item.id || idx}
+                    className="flex items-center justify-between rounded bg-paper p-2.5 text-xs border border-gold/20"
+                  >
+                    <span className="font-arabic font-medium text-ink/90">{item.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`rounded px-2 py-0.5 font-arabic text-[10px] ${
+                          item.status === "attending"
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-stone-200 text-stone-700"
+                        }`}
+                      >
+                        {item.status === "attending" ? (isAr ? "سيحضر" : "Attending") : (isAr ? "اعتذر" : "Can't make it")}
+                      </span>
+                      {item.status === "attending" && item.guests > 0 && (
+                        <span className="font-arabic text-ink/60">
+                          ({item.guests} {t.guestsCount})
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>
