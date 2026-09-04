@@ -42,18 +42,18 @@ export function RSVPSection({ t, lang }: { t: T; lang: string }) {
   };
 
   useEffect(() => {
-    fetchRsvps();
-    const interval = setInterval(fetchRsvps, 10000); // Poll every 10s for live updates
-
-    const channel = new BroadcastChannel("zoro_wedding_rsvp");
-    channel.onmessage = () => {
-      fetchRsvps();
-    };
-
-    return () => {
-      clearInterval(interval);
-      channel.close();
-    };
+    // Clear old local data - remove all previously stored responses
+    try {
+      localStorage.removeItem("zoro_rsvps");
+      localStorage.removeItem("rsvps");
+    } catch {}
+    setRsvps([]);
+    // Do not fetch old responses - keep list empty
+    // fetchRsvps();
+    // const interval = setInterval(fetchRsvps, 10000);
+    // const channel = new BroadcastChannel("zoro_wedding_rsvp");
+    // channel.onmessage = () => { fetchRsvps(); };
+    // return () => { clearInterval(interval); channel.close(); };
   }, [sheetUrl]);
 
   function loadLocalRsvps() {
